@@ -1,14 +1,30 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".activities.BookDetailActivity">
+
+
+
+    <include
+        layout="@layout/toolbar_main"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!-- Rest of content for the activity -->
+
 
     <ImageView
         android:id="@+id/ivBookCover"
         android:layout_marginTop="8dp"
         android:layout_width="280dp"
+        android:layout_below="@id/toolbar"
+        android:layout_centerInParent="true"
         android:layout_height="280dp" />
 
     <TextView
@@ -17,7 +33,12 @@
         android:layout_height="wrap_content"
         android:textSize="32sp"
         android:layout_marginTop="8dp"
+        android:layout_centerInParent="true"
+
         android:paddingLeft="10dp"
+        android:layout_below="@id/ivBookCover"
+
+
         android:paddingRight="10dp" />
 
     <TextView
@@ -25,6 +46,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="22sp"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/tvTitle"
+
+        android:layout_marginTop="8dp" />
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/tvAuthor"
+
         android:layout_marginTop="8dp" />
 
-</LinearLayout>
+</RelativeLayout>

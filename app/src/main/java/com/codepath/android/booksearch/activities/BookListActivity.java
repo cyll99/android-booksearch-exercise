@@ -1,13 +1,18 @@
 package com.codepath.android.booksearch.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +24,7 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -36,6 +42,13 @@ public class BookListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
 
+
+        // Find the toolbar view inside the activity layout
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Make sure the toolbar exists in the activity and is not null
+        setSupportActionBar(toolbar);
+
         // Checkpoint #3
         // Switch Activity to Use a Toolbar
         // see http://guides.codepath.org/android/Using-the-App-ToolBar#using-toolbar-as-actionbar
@@ -48,10 +61,10 @@ public class BookListActivity extends AppCompatActivity {
         bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                Toast.makeText(
-                        BookListActivity.this,
-                        "An item at position " + position + " clicked!",
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(
+//                        BookListActivity.this,
+//                        "An item at position " + position + " clicked!",
+//                        Toast.LENGTH_SHORT).show();
 
                 // Handle item click here:
                 // Checkpoint #5
@@ -59,10 +72,21 @@ public class BookListActivity extends AppCompatActivity {
                 // see https://guides.codepath.org/android/Using-the-RecyclerView#attaching-click-handlers-using-listeners for setting up click listeners
 
                 // Create Intent to start BookDetailActivity
+                Intent i =  new Intent(BookListActivity.this, BookDetailActivity.class);
+
+
                 // Get Book at the given position
+                Book book = abooks.get(position);
                 // Pass the book into details activity using extras
+                i.putExtra("books", Parcels.wrap(book));
+
+                BookListActivity.this.startActivity(i);
+
+
                 // see http://guides.codepath.org/android/Using-Intents-to-Create-Flows
             }
+
+
         });
 
         // Attach the adapter to the RecyclerView
@@ -72,7 +96,6 @@ public class BookListActivity extends AppCompatActivity {
         rvBooks.setLayoutManager(new LinearLayoutManager(this));
 
         // Fetch the data remotely
-        fetchBooks("Oscar Wilde");
     }
 
     // Executes an API call to the OpenLibrary search endpoint, parses the results
@@ -115,8 +138,10 @@ public class BookListActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_book_list, menu);
+        inflater.inflate(R.menu.menu_book_list, menu);
         // Checkpoint #4
         // Add SearchView to Toolbar
         // Refer to http://guides.codepath.org/android/Extended-ActionBar-Guide#adding-searchview-to-actionbar guide for more details
@@ -124,7 +149,46 @@ public class BookListActivity extends AppCompatActivity {
 
         // Checkpoint #7 Show Progress Bar
         // see https://guides.codepath.org/android/Handling-ProgressBars#progress-within-actionbar
-        return true;
+        // ... lookup the search view
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+
+            public boolean onQueryTextSubmit(String query) {
+
+                // perform query here
+                searchView.clearFocus();
+
+                fetchBooks(query);
+
+
+                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
+
+                // see https://code.google.com/p/android/issues/detail?id=24599
+
+                return true;
+
+            }
+
+
+
+            @Override
+
+            public boolean onQueryTextChange(String newText) {
+
+                return false;
+
+            }
+
+        });
+
+        return super.onCreateOptionsMenu(menu);
+
     }
 
     @Override

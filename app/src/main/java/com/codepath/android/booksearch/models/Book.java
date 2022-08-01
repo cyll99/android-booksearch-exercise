@@ -5,13 +5,21 @@ import android.text.TextUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.util.ArrayList;
-
+@Parcel
 public class Book {
     private String openLibraryId;
     private String author;
     private String title;
+    private String yearPublished;
+
+    public  Book(){}
+
+    public String getYearPublished() {
+        return yearPublished.replace("[","").replace("]","").replace("\"","");
+    }
 
     public String getOpenLibraryId() {
         return openLibraryId;
@@ -42,8 +50,10 @@ public class Book {
                 final JSONArray ids = jsonObject.getJSONArray("edition_key");
                 book.openLibraryId = ids.getString(0);
             }
+//            book.yearPublished = jsonObject.has("publish_date") ? jsonObject.getString("publish_date") :"";
             book.title = jsonObject.has("title_suggest") ? jsonObject.getString("title_suggest") : "";
             book.author = getAuthor(jsonObject);
+            book.yearPublished = getYearPublished(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -66,6 +76,22 @@ public class Book {
             return "";
         }
     }
+
+    // Return comma separated date list when there is more than one date
+    private static String getYearPublished(final JSONObject jsonObject) {
+        try {
+            final JSONArray date = jsonObject.getJSONArray("publish_date");
+            int numAuthors = date.length();
+            String dateString ="";
+            for (int i = 0; i < numAuthors; ++i) {
+                dateString = date.getString(i);
+            }
+            return dateString;
+        } catch (JSONException e) {
+            return "";
+        }
+    }
+
 
     // Decodes array of book json results into business model objects
     public static ArrayList<Book> fromJson(JSONArray jsonArray) {
